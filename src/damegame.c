@@ -3,9 +3,15 @@
 #include <stdio.h>
 #include <stdint.h>
 
+struct {
+	int :4;
+	int a:1;
+	int b:1;
+	int c:1;
+	int d:1;
+} test;
 int main(const int argc, const char *argv[]){
-	for(int i = 0; i < 256; i++){
-		printf("/* 0x%02X */	{\"\",		\"\", 	NULL,		0},\n", i);
-	}
+	test.a = 3;
+    printf("%d\n", test.a);
 
 }

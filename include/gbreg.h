@@ -11,47 +11,48 @@
 #define GBREG_H_
 
 #include <stdint.h>
+#include "types.h"
 
 typedef struct {
 	union {
 		struct {
 			union {
 				struct {
-					uint8_t :4;
-					uint8_t z :1;	// zero
-					uint8_t n :1;	// subtract
-					uint8_t h :1;	// half
-					uint8_t c :1;	// carry
+					u8 :4;
+					u8 z :1;	// zero
+					u8 n :1;	// subtract
+					u8 h :1;	// half
+					u8 c :1;	// carry
 				} fl;
-				uint8_t f;
+				u8 f;
 			};
-			uint8_t a;
+			u8 a;
 		};
-		uint16_t af;
+		u16 af;
 	};
 	union {
 		struct {
-			uint8_t c;
-			uint8_t b;
+			u8 c;
+			u8 b;
 		};
-		uint16_t bc;
+		u16 bc;
 	};
 	union {
 		struct {
-			uint8_t e;
-			uint8_t d;
+			u8 e;
+			u8 d;
 		};
-		uint16_t de;
+		u16 de;
 	};
 	union {
 		struct {
-			uint8_t l;
-			uint8_t h;
+			u8 l;
+			u8 h;
 		};
-		uint16_t hl;
+		u16 hl;
 	};
-	uint16_t sp;
-	uint16_t pc;
+	u16 sp;
+	u16 pc;
 } gbreg;
 
 extern gbreg reg;
