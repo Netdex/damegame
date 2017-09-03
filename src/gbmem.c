@@ -4,6 +4,11 @@
 uint8_t mem[65536] = {0};
 
 // TODO implement everything
+
+u8* gb_memptr(u16 addr){
+
+}
+
 uint8_t gb_read8(uint16_t addr) {
 	return 0;
 }
