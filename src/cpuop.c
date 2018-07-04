@@ -1,9 +1,22 @@
 
 
-#include <gbreg.h>
+#include "gbreg.h"
+#include "error.h"
+#include "cputable.h"
+#include "gbcpu.h"
 #include "cpuop.h"
 
-// TODO combine duplicate functions using utility functions
+
+
+/* CB */    void op_cb(){
+    u8 opcode = gb_read8(reg.pc++);
+    cpuinst *inst = gb_cbinst_table + opcode;
+    gb_inst_run(opcode, inst);
+}
+
+/* 10 */    void op_10(){
+    // TODO implement 10 opcode
+}
 
 /* 3.3.1. 8-Bit Loads */
 // 1. LD nn,n
@@ -127,7 +140,7 @@
 // 3.3.2. 16-Bit Loads
 // 1. LD n,nn
 /* 01 */    void ld_reg_bc_imm_nn(u16 op){ reg.bc = op; }
-/* 11 */    void ld_reg_de_imm_nn(u16 op){ reg.de = op; }
+/* 11 */    void op_ld_reg_de_imm_nn(u16 op){ reg.de = op; }
 /* 21 */    void ld_reg_hl_imm_nn(u16 op){ reg.hl = op; }
 /* 31 */    void ld_reg_sp_imm_nn(u16 op){ reg.sp = op; }
 
@@ -376,8 +389,77 @@ void a_add_reg_hl(u16 val){
 /* 3B */    void op_dec_reg_sp(){ --reg.sp; }
 
 
+// 3.3.5. Miscellaneous
+// 1. SWAP n
+void a_swap_reg(u8 *r){
+    *r = (u8)(((*r & 0x0f) << 4) | ((*r & 0xf0) >> 4));
+}
+/* CB 37 */ void op_swap_reg_a(){ a_swap_reg(&reg.a); }
+/* CB 30 */ void op_swap_reg_b(){ a_swap_reg(&reg.b); }
+/* CB 31 */ void op_swap_reg_c(){ a_swap_reg(&reg.c); }
+/* CB 32 */ void op_swap_reg_d(){ a_swap_reg(&reg.d); }
+/* CB 33 */ void op_swap_reg_e(){ a_swap_reg(&reg.e); }
+/* CB 34 */ void op_swap_reg_h(){ a_swap_reg(&reg.h); }
+/* CB 35 */ void op_swap_reg_l(){ a_swap_reg(&reg.l); }
+/* CB 36 */ void op_swap_ind_hl(){ a_swap_reg(gb_memptr(reg.hl)); }
 
+// 2. DAA
+/* 27 */    void op_daa_reg_a(){
+    u16 s = reg.a;
+    if(reg.fl.n){
+        if(reg.fl.h)    s = (u16) ((s - 0x06) & 0xff);
+        if(reg.fl.c)    s -= 0x60;
+    } else {
+        if(reg.fl.h || (s & 0xf) > 9)   s += 0x06;
+        if(reg.fl.c || s > 0x9f)        s += 0x60;
+    }
 
+    reg.a = (u8) s;
+    reg.fl.h = 0;
+    reg.fl.z = reg.a == 0;
+    if(s >= 0x100)  reg.fl.c = 1;
+}
 
+// 3. CPL
+/* 2F */    void op_cpl_reg_a(){
+    reg.fl.n = 1;
+    reg.fl.h = 1;
+    reg.a = ~reg.a;
+}
 
+// 4. CCF
+/* 3F */    void op_ccf(){
+    reg.fl.n = 0;
+    reg.fl.h = 0;
+    reg.fl.c = ~reg.fl.c;
+}
+
+// 5. SCF
+/* 37 */    void op_scf(){
+    reg.fl.n = 0;
+    reg.fl.h = 0;
+    reg.fl.c = 1;
+}
+
+// 6. NOP
 /* 00 */    void op_nop(){}
+
+// 7. HALT
+/* 76 */    void op_halt(){
+    // TODO implement halt after interrupts implemented
+}
+
+// 8. STOP
+/* 10 00 */ void op_stop(){
+    // TODO implement after lcd and input implemented
+}
+
+// 9. DI
+/* F3 */    void op_di(){
+    // TODO implement after interrupts implemented
+}
+
+// 10. EI
+/* FB */    void op_ei(){
+    // TODO implement after interrupts implemented
+}

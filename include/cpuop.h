@@ -8,6 +8,10 @@
 #include "gbmem.h"
 #include "types.h"
 
+/* CB */    void op_cb();
+/* 10 */    void op_10();
+
+
 // 3.3.1. 8-Bit Loads
 // 1. LD nn,n
 /* 06 */	void op_ld_reg_b_imm_n(u8);
@@ -129,7 +133,7 @@
 // 3.3.2. 16-Bit Loads
 // 1. LD n,nn
 /* 01 */    void ld_reg_bc_imm_nn(u16);
-/* 11 */    void ld_reg_de_imm_nn(u16);
+/* 11 */    void op_ld_reg_de_imm_nn(u16);
 /* 21 */    void ld_reg_hl_imm_nn(u16);
 /* 31 */    void ld_reg_sp_imm_nn(u16);
 
@@ -300,29 +304,49 @@ void a_add_reg_hl(u16 val);
 /* 3B */    void op_dec_reg_sp();
 
 // 3.3.5. Miscellaneous
-// CB
-void op_cb();
 // 1. SWAP n
 void a_swap_reg(u8 *r);
-/*  */
-/*  */
-/*  */
-/*  */
-/*  */
-/*  */
-/*  */
-/*  */
-/*  */
-/*  */
-/*  */
-/*  */
-/*  */
-/*  */
+/* CB 37 */ void op_swap_reg_a();
+/* CB 30 */ void op_swap_reg_b();
+/* CB 31 */ void op_swap_reg_c();
+/* CB 32 */ void op_swap_reg_d();
+/* CB 33 */ void op_swap_reg_e();
+/* CB 34 */ void op_swap_reg_h();
+/* CB 35 */ void op_swap_reg_l();
+/* CB 36 */ void op_swap_ind_hl();
 
+// 2. DAA
+/* 27 */    void op_daa_reg_a();
 
+// 3. CPL
+/* 2F */    void op_cpl_reg_a();
 
+// 4. CCF
+/* 3F */    void op_ccf();
 
+// 5. SCF
+/* 37 */    void op_scf();
 
-
+// 6. NOP
 /* 00 */    void op_nop();
+
+// 7. HALT
+/* 76 */    void op_halt();
+
+// 8. STOP
+/* 10 00 */ void op_stop();
+
+// 9. DI
+/* F3 */    void op_di();
+
+// 10. EI
+/* FB */    void op_ei();
+
+
+
+
+
+
+
+
 #endif /* CPUOP_H_ */
