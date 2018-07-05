@@ -15,10 +15,13 @@ bool gb_do_interrupt = false;   // TODO determine initial state
 
 void gb_init() {
     gb_write(0, bootrom, 256);
+    gb_reset();
 }
+
 void gb_reset() {
     reg.pc = 0;
 }
+
 void gb_load(u8 *rom, size_t sz) {
 
 }
@@ -65,9 +68,8 @@ cpuinst* gb_step() {
 }
 
 void gb_printreg(){
-    printf("=== REGISTERS ===\n"
-           "PC: %04x\tSP: %04x\n"
-           "A: %02x\tB: %02x\tC: %02x\tD: %02x\tE: %02x\tF: %02x\tH: %02x\tL: %02x",
+    printf("PC: %04x\tSP: %04x\n"
+           "A: %02x\tB: %02x\tC: %02x\tD: %02x\tE: %02x\tF: %02x\tH: %02x\tL: %02x\n",
             reg.pc, reg.sp, reg.a, reg.b, reg.c, reg.d, reg.e, reg.f, reg.h, reg.l);
 }
 

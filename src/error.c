@@ -12,11 +12,12 @@ void error(){
 }
 
 void error_msg(const char* msg){
-    printf("FATAL ERROR:\n");
+    printf("FATAL ERROR: ");
     if(msg){
         printf("%s\n", msg);
     } else {
         printf("unspecified error\n");
     }
+    getchar();
     exit(1);
 }
