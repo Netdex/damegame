@@ -156,7 +156,7 @@
     reg.hl = (u16) res;
     reg.fl.z = 0;
     reg.fl.n = 0;
-    reg.fl.h = (reg.sp & 0x0f + (op) & 0x0f) > 0x0f;
+    reg.fl.h = ((reg.sp & 0x0f) + (op & 0x0f)) > 0x0f;
     reg.fl.c = (res & 0xffff0000) != 0;
 }
 
