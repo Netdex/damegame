@@ -1,4 +1,5 @@
 
+#include <assert.h>
 #include "gbmem.h"
 
 struct {
@@ -17,18 +18,20 @@ struct {
 // TODO implement everything
 
 u8* gb_memptr(u16 addr){
-    if(addr < 0x4000)   return mem.pbank    + addr;
-    if(addr < 0x8000)   return mem.sbank    + addr - 0x4000;
-    if(addr < 0xa000)   return mem.vram     + addr - 0x8000;
-    if(addr < 0xc000)   return mem.sram     + addr - 0xa000;
-    if(addr < 0xd000)   return mem.wbank0   + addr - 0xc000;
-    if(addr < 0xe000)   return mem.wbank1   + addr - 0xd000;
-    if(addr < 0xf000)   return mem.wbank0   + addr - 0xe000;
-    if(addr < 0xfe00)   return mem.wbank1   + addr - 0xf000;
-    if(addr < 0xff00)   return mem.sat      + addr - 0xfe00;
-    if(addr < 0xff80)   return mem.dev      + addr - 0xfe00;
-    if(addr < 0xffff)   return mem.hram     + addr - 0xff80;
-    return &mem.ier;
+    assert(addr >= 0 && addr <= 0xffff);
+    if(addr <  0x4000)   return mem.pbank    + addr;
+    if(addr <  0x8000)   return mem.sbank    + addr - 0x4000;
+    if(addr <  0xa000)   return mem.vram     + addr - 0x8000;
+    if(addr <  0xc000)   return mem.sram     + addr - 0xa000;
+    if(addr <  0xd000)   return mem.wbank0   + addr - 0xc000;
+    if(addr <  0xe000)   return mem.wbank1   + addr - 0xd000;
+    if(addr <  0xf000)   return mem.wbank0   + addr - 0xe000;
+    if(addr <  0xfe00)   return mem.wbank1   + addr - 0xf000;
+    if(addr <  0xff00)   return mem.sat      + addr - 0xfe00;
+    if(addr <  0xff80)   return mem.dev      + addr - 0xfe00;
+    if(addr <  0xffff)   return mem.hram     + addr - 0xff80;
+    if(addr == 0xffff)   return &mem.ier;
+    return NULL;
 }
 
 uint8_t gb_read8(u16 addr) {
