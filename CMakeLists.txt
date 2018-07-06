@@ -18,7 +18,7 @@ else ()
 endif ()
 
 add_executable(damegame ${SOURCE_FILES}
-        src/cpuop.c src/cputable.c src/damegame.c src/error.c src/gbcpu.c src/gbmem.c src/gbreg.c src/sdl_wrapper.c)
+        src/cpuop.c src/cputable.c src/damegame.c src/gbcpu.c src/gbmem.c src/gbreg.c src/sdl_wrapper.c src/gbcart.c include/gbcart.h)
 target_include_directories(damegame PUBLIC ${SDL2_INCLUDE_DIR})
 target_link_libraries(damegame ${SDL2_LIBRARIES})
 

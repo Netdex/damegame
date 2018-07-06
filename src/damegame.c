@@ -10,7 +10,7 @@
 #include "cputable.h"
 
 int main(int argc, char *argv[]){
-    if (!CSDL_Init("damegame", 256, 256))
+    if (!CSDL_Init("damegame", 160, 144))
         return -1;
 
     gb_init();
