@@ -15,6 +15,12 @@
 #define IRQ_TIMER   (1<<2)
 #define IRQ_JOYPAD  (1<<4)
 
+#define DIVIDER_CYCLES  256
+#define SCANLINE_CYCLES 456
+
+#define LCD_MODE2_BOUNDS    376
+#define LCD_MODE3_BOUNDS    204
+
 struct {
     u16 addr;
     u8 val;

@@ -12,6 +12,10 @@
 #define TMA     0xff06  // timer modulator address (reset)
 #define TMC     0xff07  // timer controller address (freq)
 #define IRQ_REG 0xff0f
+#define LCD_CTL 0xff40
+#define LCD_STA 0xff41
+#define SCAN_LN 0xff44
+#define DMA_XFR 0xff46
 #define IRQ_EN  0xffff
 
 typedef union {

@@ -84,9 +84,16 @@ void gb_write8(u16 addr, u8 value) {
             if (cart.useRombank)
                 cart.ramIdx = 0;
         }
-    } else if (addr == 0xff04) {
+    } else if (addr == DIV_REG) {
         // divider register clear
         mem.raw[0xff04] = 0;
+    } else if (addr == SCAN_LN) {
+        mem.raw[0xff44] = 0;
+    } else if (addr == DMA_XFR) {
+        u16 iaddr = value << 8;
+        for (int i = 0; i < 0xa0; i++) {
+            gb_write8((u16) (0xfe00 + i), gb_read8((u16) (iaddr + i)));
+        }
     } else {
         if (addr < 0xa000 || addr >= 0xc000 || cart.useRam)
             *gb_memptr(addr) = value;

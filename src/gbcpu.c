@@ -16,9 +16,9 @@
 const int TMC_BIT_TO_TIMER_COUNT[] = {1024, 16, 64, 256};
 const u8 IRQ_TO_SERVICE_ADDR[] = {0x40, 0x48, 0x50, 0x00, 0x60, 0x00, 0x00, 0x00};
 
-int divTimerTick = 256;               // current divider timer tick
+int divTimerTick = DIVIDER_CYCLES;               // current divider timer tick
 int timerTick = 1024;                  // current timer tick
-int scanlineTick = 456;
+int scanlineTick = SCANLINE_CYCLES;
 bool interruptsEnabled = false;     // interrupt master enable flag set by EI/DI
 
 void gb_init() {
@@ -95,7 +95,7 @@ void gb_update_timer(int cycles) {
     // divider register update
     divTimerTick -= cycles;
     if (divTimerTick <= 0) {
-        divTimerTick += 256;    // assumption: no inst >256 cycles
+        divTimerTick += DIVIDER_CYCLES;    // assumption: no inst >256 cycles
         mem.raw[DIV_REG]++;
     }
 
@@ -116,16 +116,74 @@ void gb_update_timer(int cycles) {
 }
 
 void gb_update_gfx(int cycles) {
+    // lcd status manipulation
+    u8 sta = gb_read8(LCD_STA);
+    if (gb_read8(LCD_CTL) & (1 << 7)) {   // lcd enabled
+        u8 currentLine = gb_read8(SCAN_LN);
+        u8 currentMode = (u8) (sta & 0x3);
+        u8 mode = 0;
+        bool reqInt = false;
 
+        if (currentLine >= 144) {
+            mode = 1;
+            sta = (u8) ((sta | 1) & ~(1 << 1));
+            reqInt = (bool) (sta & (1 << 4));
+        } else {
+            if (scanlineTick >= LCD_MODE2_BOUNDS) {
+                mode = 2;
+                sta = (u8) ((sta | 2) & ~1);
+                reqInt = (bool) (sta & (1 << 5));
+            } else if (scanlineTick >= LCD_MODE3_BOUNDS) {
+                mode = 3;
+                sta |= 3;
+            } else {
+                mode = 0;
+                sta &= ~3;
+                reqInt = (bool) (sta & (1 << 3));
+            }
+        }
+
+        if (reqInt && (mode != currentMode))
+            gb_req_interrupt(IRQ_LCD);
+
+        if (currentLine == gb_read8(0xff45)) {
+            sta |= 1 << 2;
+            if (sta & (1 << 6))
+                gb_req_interrupt(IRQ_LCD);
+        } else {
+            sta &= ~(1 << 2);
+        }
+        gb_write8(LCD_STA, sta);
+
+        // gfx manipulation
+        scanlineTick -= cycles;
+        if(scanlineTick <= 0){
+            scanlineTick += SCANLINE_CYCLES;
+            mem.raw[SCAN_LN]++;
+            currentLine = gb_read8(SCAN_LN);
+
+            if(currentLine == 144)
+                gb_req_interrupt(IRQ_VBLANK);
+            else if(currentLine > 153)
+                mem.raw[SCAN_LN] = 0;
+            else if(currentLine < 144){
+                // TODO draw
+            }
+        }
+    } else {
+        scanlineTick = SCANLINE_CYCLES;
+        mem.raw[SCAN_LN] = 0;
+        gb_write8(LCD_STA, (u8) ((sta & 252) | 1));
+    }
 }
 
 void gb_do_interrupt() {
-    if(interruptsEnabled){
+    if (interruptsEnabled) {
         u8 req = gb_read8(IRQ_REG);
         u8 en = gb_read8(IRQ_EN);
-        if(req > 0){
-            for(int i = 0; i < 8; i++){
-                if((req & (1 << i)) && (en & (1 << i))){
+        if (req > 0) {
+            for (int i = 0; i < 8; i++) {
+                if ((req & (1 << i)) && (en & (1 << i))) {
                     interruptsEnabled = false;
                     gb_write8(IRQ_REG, (u8) (gb_read8(IRQ_REG) & ~(1 << i)));   // reset irq bit
                     a_push_reg(reg.pc);
