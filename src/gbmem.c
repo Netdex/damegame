@@ -7,19 +7,7 @@
 #include "gbcpu.h"
 
 gbcart_t cart;
-
-struct {
-    u8 pbank[0x4000];   // permanent rom
-    u8 sbank[0x4000];   // switchable rom
-    u8 vram[0x2000];    // video ram
-    u8 _sram[0x2000];   // switchable external ram bank (padding)
-    u8 wbank0[0x2000];  // working ram bank 0
-    u8 wbank1[0x2000];  // working ram bank 1
-    u8 sat[0x100];      // sprite attribute table
-    u8 dev[0x80];       // device mapping
-    u8 hram[0x7f];      // high ram
-    u8 ier;             // interrupt enable register
-} mem;
+gbmem_t mem;
 
 void gb_meminit() {
     gb_write(0, bootrom, 256);
@@ -96,6 +84,9 @@ void gb_write8(u16 addr, u8 value) {
             if (cart.useRombank)
                 cart.ramIdx = 0;
         }
+    } else if (addr == 0xff04) {
+        // divider register clear
+        mem.raw[0xff04] = 0;
     } else {
         if (addr < 0xa000 || addr >= 0xc000 || cart.useRam)
             *gb_memptr(addr) = value;

@@ -7,10 +7,30 @@
 #include "types.h"
 #include "gbcart.h"
 
-#define TIMA    0xFF05  // timer address
-#define TMA     0xFF06  // timer modulator address (reset)
-#define TMC     0xFF07  // timer controller address (freq)
+#define DIV_REG 0xff04
+#define TIMA    0xff05  // timer address
+#define TMA     0xff06  // timer modulator address (reset)
+#define TMC     0xff07  // timer controller address (freq)
+#define IRQ_REG 0xff0f
+#define IRQ_EN  0xffff
 
+typedef union {
+    struct {
+        u8 pbank[0x4000];   // permanent rom
+        u8 sbank[0x4000];   // switchable rom
+        u8 vram[0x2000];    // video ram
+        u8 _sram[0x2000];   // switchable external ram bank (padding)
+        u8 wbank0[0x2000];  // working ram bank 0
+        u8 wbank1[0x2000];  // working ram bank 1
+        u8 sat[0x100];      // sprite attribute table
+        u8 dev[0x80];       // device mapping
+        u8 hram[0x7f];      // high ram
+        u8 ier;             // interrupt enable register
+    };
+    u8 raw[0xffff];
+} gbmem_t;
+
+extern gbmem_t mem;
 extern gbcart_t cart;
 
 void gb_meminit();

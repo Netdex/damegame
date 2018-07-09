@@ -1,7 +1,6 @@
 
 
 #include "gbreg.h"
-#include "error.h"
 #include "cputable.h"
 #include "gbcpu.h"
 #include "cpuop.h"

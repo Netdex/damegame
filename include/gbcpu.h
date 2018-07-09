@@ -10,6 +10,11 @@
 
 #define CLOCKSPEED  4194304
 
+#define IRQ_VBLANK  (1<<0)
+#define IRQ_LCD     (1<<1)
+#define IRQ_TIMER   (1<<2)
+#define IRQ_JOYPAD  (1<<4)
+
 struct {
     u16 addr;
     u8 val;
@@ -31,9 +36,14 @@ void gb_init();
 void gb_reset();
 void gb_load(u8 *rom, size_t sz);
 
+void gb_update(int cycles);
 cpuinst* gb_step();
 void gb_inst_run(u8 opcode, cpuinst *inst);
 void gb_printreg();
-void gb_update_timer();
+
+void gb_update_timer(int cycles);
+void gb_update_gfx(int cycles);
+void gb_do_interrupt();
+void gb_req_interrupt(u8 irq);
 
 #endif /* INCLUDE_GBCPU_H_ */
